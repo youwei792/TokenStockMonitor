@@ -428,10 +428,13 @@ async function handleKimiLoginExpired(cfg) {
   await updateState(state => {
     wasLoggedIn = state.kimiLogin !== 'logged_out';
     state.kimiLogin = 'logged_out';
+    // 收口：清空套餐基线，防止登录恢复后基于过期基线误判状态变化
+    // （Kimi 用 fetch 每次拿新数据，本身无过渡期误报，但清基线更稳妥）
+    state.kimi = {};
     return state;
   });
   if (wasLoggedIn) {
-    await pushLog('warn', `Kimi 登录态失效`, { front: true });
+    await pushLog('warn', `Kimi 登录态失效（已清空套餐基线，登录恢复后重新建基线）`, { front: true });
     await pushNotify(cfg, '⚠️【Kimi登录过期】', '请重新登录 Kimi，否则无法监控订阅开放', KIMI.PAGE_URL);
     await desktopNotify('⚠️ Kimi 登录过期', '请重新登录 Kimi，否则无法监控订阅开放');
   }
@@ -454,15 +457,24 @@ async function handleGlmStateChanged(cfg, payload) {
   // 账户信息上报：存到 state，不触发通知
   if (planKey === '_account' && account) {
     let firstAccount = false;
+    let clearedCooldown = false;
     await updateState(state => {
       state.glm = state.glm || {};
       firstAccount = !state.glmAccount;
       state.glmAccount = account.name || '';
       state.glmLogin = 'logged_in';
+      // 账户信息上报 = 登录已恢复，清掉冷却期（若存在）
+      if (state.glmCooldownUntil) {
+        clearedCooldown = true;
+        delete state.glmCooldownUntil;
+      }
       return state;
     });
     if (firstAccount) {
       await pushLog('info', `GLM 账户：${account.name || '(未知)'}（登录态正常）`);
+    }
+    if (clearedCooldown) {
+      await pushLog('info', `GLM 登录已恢复，已清除误报冷却期`, { front: true });
     }
     return;
   }
@@ -475,10 +487,15 @@ async function handleGlmStateChanged(cfg, payload) {
       wasLoggedIn = state.glmLogin !== 'logged_out';
       state.glmLogin = 'logged_out';
       state.glm['_login'] = { status, text: buttonText, lastSeen: Date.now() };
+      // 收口关键：登录失效瞬间，页面常处于过渡态（套餐按钮已变可购买文案，
+      // 但"登录"按钮还没渲染），会误发多条放货通知。清空所有套餐基线 + 设 2 分钟冷却期，
+      // 过渡期内收到的 available 一律不通知；登录恢复后清冷却，重新建基线。
+      for (const k of ['lite', 'pro', 'max']) delete state.glm[k];
+      state.glmCooldownUntil = Date.now() + 2 * 60 * 1000;
       return state;
     });
     if (wasLoggedIn) {
-      await pushLog('warn', `GLM 登录态失效，已通知用户`, { front: true });
+      await pushLog('warn', `GLM 登录态失效，已通知用户（已清空套餐基线+设 2 分钟冷却期防误报）`, { front: true });
       await pushNotify(cfg, '⚠️【GLM登录过期】', '检测到登录已失效！请尽快重新登录智谱，否则无法监控放货', GLM.PAGE_URL);
       await desktopNotify('⚠️ GLM 登录过期', '请尽快重新登录智谱，否则无法监控放货');
     }
@@ -492,11 +509,19 @@ async function handleGlmStateChanged(cfg, payload) {
 
   // 正常套餐状态变化：原子读-改-写（关键！多个套餐几乎同时上报，
   // 必须串行化，否则各自读同一份旧 state 后互相覆盖，只留最后一个）
+  // 冷却期检查：登录失效后 2 分钟内收到的 available 一律不通知（防过渡期误报）
+  // 登录已恢复（收到正常套餐上报说明已登录）则清掉冷却期
+  let inCooldown = false;
   let shouldNotify = false;
   let prevStatus = null;
   let isFirstSeen = false;
   await updateState(state => {
     state.glm = state.glm || {};
+    // 收到正常套餐上报 = 登录已恢复，清掉冷却期
+    if (state.glmCooldownUntil) {
+      inCooldown = Date.now() < state.glmCooldownUntil;
+      delete state.glmCooldownUntil;
+    }
     const prev = state.glm[planKey];
     prevStatus = prev?.status || null;
     isFirstSeen = !prev;
@@ -508,7 +533,8 @@ async function handleGlmStateChanged(cfg, payload) {
     state.glmLogin = 'logged_in';
 
     // 售罄/繁忙 -> 可购买：标记通知（仅勾选的套餐才通知），通知在 updater 外发
-    shouldNotify = wasSoldOut && nowAvailable && cfg.glm.targets[planKey];
+    // 冷却期内 available 不通知（登录过期过渡期保护）
+    shouldNotify = wasSoldOut && nowAvailable && cfg.glm.targets[planKey] && !inCooldown;
     return state;
   });
 
@@ -529,6 +555,9 @@ async function handleGlmStateChanged(cfg, payload) {
     await pushLog('success', `GLM ${name} 放货！${body}`, { front: true });
     await pushNotify(cfg, title, body, GLM.PAGE_URL);
     await desktopNotify(title, body);
+  } else if (inCooldown && status === STATUS.AVAILABLE) {
+    // 冷却期内 available 不通知，留痕便于复盘
+    await pushLog('warn', `GLM ${name} 检测到可购买，但处于登录失效冷却期内，已抑制通知（防误报）`, { front: true });
   }
 }
 

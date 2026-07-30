@@ -88,7 +88,7 @@
   // ============================================================
   // 扫描所有套餐卡片
   // ============================================================
-  function scanCards() {
+  async function scanCards() {
     // 登录态检测：未登录立即上报，不判断库存（避免误报放货）
     const loggedIn = checkLogin();
     if (!loggedIn) {
@@ -131,6 +131,24 @@
         reportState('_page_state', 'no_cards', location.href, null);
       }
       return;
+    }
+
+    // 收口：sold_out/busy -> available 是高价值信号，但登录过期瞬间页面过渡态
+    // 会让套餐按钮短暂显示"可订阅"（实为登录失效后的默认态）。
+    // 若本轮扫描有任一套餐变为 available，统一复查一次登录态：
+    //   失效 -> 全部 available 不上报，交由下一轮 checkLogin 上报 _login
+    //   正常 -> 正常上报（真正放货时登录态是好的，复查通过）
+    const anyBecameAvailable = Object.entries(found).some(([k, info]) => {
+      const prev = lastReport[k];
+      return info.status === 'available' && prev && prev.status !== 'available';
+    });
+    if (anyBecameAvailable) {
+      // 短暂等待让"登录"按钮有机会渲染（过渡期通常 <1s），只复查一次
+      await new Promise(r => setTimeout(r, 800));
+      if (!checkLogin()) {
+        console.warn('[TSM] 检测到 available 但复查登录态已失效，本轮抑制上报（防过渡期误报）');
+        return; // 不更新 lastReport、不上报，等下轮 checkLogin 上报 _login
+      }
     }
 
     // 比对并上报变化
