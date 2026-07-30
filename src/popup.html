@@ -13,15 +13,19 @@
     </label>
   </div>
 
-  <!-- 企业微信配置 -->
+  <!-- 企业微信配置（可折叠） -->
   <section class="card">
-    <h2>企业微信通知</h2>
-    <label>群机器人 Key <input type="password" id="wecomKey" placeholder="webhook 地址里 key= 后面的部分" autocomplete="off"></label>
-    <p class="sub">企业微信群 → 右上角 → 群机器人 → 添加 → 复制 webhook，key= 后面那段就是</p>
-    <div class="row">
-      <button id="testBark" class="btn">测试推送</button>
-      <span id="barkResult" class="hint"></span>
-    </div>
+    <details class="collapsible">
+      <summary><h2>企业微信通知</h2></summary>
+      <div class="collapsible-body">
+        <label>群机器人 Key <input type="password" id="wecomKey" placeholder="webhook 地址里 key= 后面的部分" autocomplete="off"></label>
+        <p class="sub">企业微信群 -> 右上角 -> 群机器人 -> 添加 -> 复制 webhook，key= 后面那段就是</p>
+        <div class="row">
+          <button id="testBark" class="btn">测试推送</button>
+          <span id="barkResult" class="hint"></span>
+        </div>
+      </div>
+    </details>
   </section>
 
   <!-- GLM 配置 -->
