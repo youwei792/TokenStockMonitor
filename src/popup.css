@@ -177,6 +177,17 @@ input[type="number"]:focus {
   line-height: 1.9;
 }
 
+.tip {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin: -2px 0 7px;
+  line-height: 1.5;
+  padding: 5px 9px;
+  background: #fff8e6;
+  border-left: 3px solid var(--orange);
+  border-radius: 0 6px 6px 0;
+}
+
 /* ---------- 套餐选择 ---------- */
 .targets {
   display: flex;

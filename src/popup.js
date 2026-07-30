@@ -55,6 +55,8 @@ function renderConfig(cfg) {
   const restock = `${String(cfg.glm.restockHour || 10).padStart(2,'0')}:${String(cfg.glm.restockMinute || 0).padStart(2,'0')}`;
   $('#glmRestock').value = restock;
   $('#glmPrep').value = cfg.glm.prepMinutes ?? 5;
+  $('#glmScanNormal').value = cfg.glm.scanNormalSec ?? 10;
+  $('#glmScanBurst').value = cfg.glm.scanBurstSec ?? 3;
 
   document.querySelectorAll('.glm-target').forEach(el => {
     el.checked = !!cfg.glm.targets[el.dataset.plan];
@@ -150,6 +152,9 @@ async function saveConfig() {
   cfg.glm.restockHour = h || 10;
   cfg.glm.restockMinute = m || 0;
   cfg.glm.prepMinutes = parseInt($('#glmPrep').value) || 5;
+  // 扫描间隔：最小 1 秒防卡死，最大 60 秒
+  cfg.glm.scanNormalSec = Math.min(60, Math.max(1, parseInt($('#glmScanNormal').value) || 10));
+  cfg.glm.scanBurstSec = Math.min(60, Math.max(1, parseInt($('#glmScanBurst').value) || 3));
   cfg.kimi.fetchIntervalMin = Math.max(1, parseInt($('#kimiInterval').value) || 10);
 
   document.querySelectorAll('.glm-target').forEach(el => {
@@ -204,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 任意配置变更即保存
-  ['enabled', 'wecomKey', 'glmEnabled', 'kimiEnabled', 'glmRestock', 'glmPrep', 'kimiInterval'].forEach(id => {
+  ['enabled', 'wecomKey', 'glmEnabled', 'kimiEnabled', 'glmRestock', 'glmPrep', 'glmScanNormal', 'glmScanBurst', 'kimiInterval'].forEach(id => {
     $('#' + id).addEventListener('change', saveConfig);
   });
   document.querySelectorAll('.glm-target, .kimi-target').forEach(el => {

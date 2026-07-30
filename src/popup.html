@@ -31,6 +31,8 @@
       <label class="switch"><input type="checkbox" id="glmEnabled"><span class="slider sm"></span></label>
     </div>
     <p class="sub">放货时间 <input type="time" id="glmRestock" value="10:00"> · 提前 <input type="number" id="glmPrep" value="5" min="1" max="30" class="num"> 分自动开页</p>
+    <p class="sub">扫描间隔：平时 <input type="number" id="glmScanNormal" value="10" min="1" max="60" class="num"> 秒 · 放货窗口 <input type="number" id="glmScanBurst" value="3" min="1" max="60" class="num"> 秒</p>
+    <p class="tip">⏱ 间隔越短越及时，但过快（&lt;3 秒）可能触发平台风控，建议保持默认</p>
     <div class="targets">
       <label><input type="checkbox" class="glm-target" data-plan="lite"> Lite</label>
       <label><input type="checkbox" class="glm-target" data-plan="pro" checked> Pro</label>

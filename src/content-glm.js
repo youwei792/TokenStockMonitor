@@ -11,8 +11,8 @@
   const BUSY_RE = /抢购人数过多|请刷新/;
   const PURCHASABLE_TEXTS = ['特惠订阅', '立即订阅', '立即购买', '购买'];
   const RESTOCK_RE = /(\d{1,2})月(\d{1,2})日\s*(\d{1,2}):(\d{2})/;
-  const NORMAL_SEC = 10;
-  const BURST_SEC = 3;
+  const DEFAULT_NORMAL_SEC = 10;   // 平时扫描间隔兜底（配置缺失时用）
+  const DEFAULT_BURST_SEC = 3;     // 放货窗口扫描间隔兜底
 
   let CONFIG = { glm: { targets: { lite: false, pro: true, max: false } } };
   let lastReport = {};   // { lite: {status, text, restockText}, ... } 上次上报状态，用于去重
@@ -174,7 +174,7 @@
   }
 
   // ============================================================
-  // 定时扫描：平时 10s，放货窗口 3s
+  // 定时扫描：平时 N 秒，放货窗口 M 秒（均可在 popup 自定义）
   // ============================================================
   function getIntervalSec() {
     // 放货窗口：用配置的放货时间（与 background isInGlmBurstWindow 一致）
@@ -186,7 +186,11 @@
     const prepStart = restock.getTime() - prep;
     const burstEnd = restock.getTime() + 5 * 60 * 1000;
     const t = now.getTime();
-    return (t >= prepStart && t <= burstEnd) ? BURST_SEC : NORMAL_SEC;
+    const inBurst = t >= prepStart && t <= burstEnd;
+    // 用户可配扫描间隔；非法/过小值兜底为默认（最小 1 秒，防 0 或负数卡死）
+    const normal = Math.max(1, CONFIG.glm.scanNormalSec ?? DEFAULT_NORMAL_SEC);
+    const burst = Math.max(1, CONFIG.glm.scanBurstSec ?? DEFAULT_BURST_SEC);
+    return inBurst ? burst : normal;
   }
 
   function startHeartbeat() {

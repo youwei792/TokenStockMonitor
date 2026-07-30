@@ -27,7 +27,9 @@ export const DEFAULT_CONFIG = {
     autoCloseMinutes: 10,              // 放货后多少分钟自动关页面（10:00 + 10 = 10:10）
     restockHour: 10,                    // 放货时间-小时
     restockMinute: 0,                   // 放货时间-分钟
-    prepMinutes: 5                      // 提前几分钟打开页面/进入高频
+    prepMinutes: 5,                     // 提前几分钟打开页面/进入高频
+    scanNormalSec: 10,                  // 平时页面扫描间隔（秒），过快可能触发风控
+    scanBurstSec: 3                     // 放货窗口页面扫描间隔（秒），过快可能触发风控
   },
   kimi: {
     enabled: true,
