@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "TokenStockMonitor - Coding Plan 放货监控",
+  "name": "TokenStockMonitor - Coding Plan 补货提醒",
   "version": "1.0.0",
-  "description": "监控 GLM Coding Plan 放货与 Kimi Coding Plan 开放订阅，状态变化时通过 Bark 推送到 iPhone",
+  "description": "监控 GLM Coding Plan 与 Kimi Code Plan 的套餐状态变化，状态改变时通过企业微信群机器人提醒。仅提醒，不抢购、不下单。",
   "permissions": [
     "storage",
     "alarms",
@@ -35,7 +35,7 @@
   ],
   "action": {
     "default_popup": "src/popup.html",
-    "default_title": "Coding Plan 放货监控",
+    "default_title": "Coding Plan 补货提醒",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

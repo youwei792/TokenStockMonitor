@@ -215,7 +215,7 @@ async function handleGlmWindow(cfg) {
         await checkGlmTabLogin(cfg, glmTabId);
       }
       // 启动秒级刷新定时器（仅启动一次，靠 glmBurstTimerStarted 去重）
-      // 9:59-10:05 每 5 秒刷新一次；10:00:00 强制刷新，确保放货瞬间抓到
+      // 放货后每 3 秒整页刷新一次（POST_RELOAD_INTERVAL）；10:00:00 强制刷新，确保放货瞬间抓到
       if (!state0.glmBurstTimerStarted) {
         await startGlmBurstReload(cfg, glmTabId);
       }

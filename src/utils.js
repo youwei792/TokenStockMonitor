@@ -1,4 +1,4 @@
-// utils.js - 共享工具：Bark推送、状态分类、登录态检测、日志、时间格式化
+// utils.js - 共享工具：通知推送（企业微信群机器人主 / Bark备选）、状态分类、登录态检测、日志、时间格式化
 
 import { GLM, KIMI, STATUS, STORAGE_KEYS, DEFAULT_CONFIG, SCHEDULE } from './constants.js';
 
