@@ -98,9 +98,12 @@ export async function pushWecom(cfg, title, body, url = '') {
     const content = url
       ? `**${title}**\n${body}\n[点击前往](${url})`
       : `**${title}**\n${body}`;
+    // 注意：MV3 Service Worker 的 fetch 受 CORS 限制。
+    // 企业微信 webhook 不返回 CORS 头，若带 Content-Type: application/json 会触发预检请求被拦截。
+    // 改用 text/plain（简单请求，不触发预检），企业微信仍按 JSON 解析 body。
     const res = await fetch(webhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         msgtype: 'markdown',
         markdown: { content }
