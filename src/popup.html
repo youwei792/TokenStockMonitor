@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Coding Plan 放货监控</h1>
+    <label class="switch">
+      <input type="checkbox" id="enabled">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- 企业微信配置 -->
+  <section class="card">
+    <h2>企业微信通知</h2>
+    <label>群机器人 Key <input type="password" id="wecomKey" placeholder="webhook 地址里 key= 后面的部分" autocomplete="off"></label>
+    <p class="sub">企业微信群 → 右上角 → 群机器人 → 添加 → 复制 webhook，key= 后面那段就是</p>
+    <div class="row">
+      <button id="testBark" class="btn">测试推送</button>
+      <span id="barkResult" class="hint"></span>
+    </div>
+  </section>
+
+  <!-- GLM 配置 -->
+  <section class="card">
+    <div class="card-head">
+      <h2>GLM Coding Plan</h2>
+      <label class="switch"><input type="checkbox" id="glmEnabled"><span class="slider sm"></span></label>
+    </div>
+    <p class="sub">放货时间 <input type="time" id="glmRestock" value="10:00"> · 提前 <input type="number" id="glmPrep" value="5" min="1" max="30" class="num"> 分自动开页</p>
+    <div class="targets">
+      <label><input type="checkbox" class="glm-target" data-plan="lite"> Lite</label>
+      <label><input type="checkbox" class="glm-target" data-plan="pro" checked> Pro</label>
+      <label><input type="checkbox" class="glm-target" data-plan="max"> Max</label>
+    </div>
+    <div class="row">
+      <button id="glmCheckNow" class="btn sm">立即检查</button>
+    </div>
+    <div class="login-status" id="glmLogin">登录状态：未知</div>
+    <div class="status" id="glmStatus">加载中…</div>
+  </section>
+
+  <!-- Kimi 配置 -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Kimi Code Plan</h2>
+      <label class="switch"><input type="checkbox" id="kimiEnabled"><span class="slider sm"></span></label>
+    </div>
+    <p class="sub">后台每 <input type="number" id="kimiInterval" value="10" min="1" max="60" class="num"> 分钟检查一次开放状态</p>
+    <div class="targets">
+      <label><input type="checkbox" class="kimi-target" data-plan="Andante" checked> Andante</label>
+      <label><input type="checkbox" class="kimi-target" data-plan="Moderato" checked> Moderato</label>
+      <label><input type="checkbox" class="kimi-target" data-plan="Allegretto" checked> Allegretto</label>
+      <label><input type="checkbox" class="kimi-target" data-plan="Allegro" checked> Allegro</label>
+    </div>
+    <div class="row">
+      <button id="kimiCheckNow" class="btn sm">立即检查</button>
+    </div>
+    <div class="login-status" id="kimiLogin">登录状态：未知</div>
+    <div class="status" id="kimiStatus">加载中…</div>
+  </section>
+
+  <!-- 日志 -->
+  <section class="card">
+    <h2>最近日志</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

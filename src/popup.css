@@ -1,0 +1,328 @@
+/* ============================================================
+   TokenStockMonitor Popup UI
+   设计：现代圆角卡片、柔和阴影、清晰层级、平台色标
+   所有 class/id 与 popup.js 严格对齐，仅样式优化
+   ============================================================ */
+
+:root {
+  --bg: #eef1f6;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --ink-3: #9a9aa0;
+  --line: #ececf0;
+  --line-2: #e2e2e8;
+  --blue: #007aff;
+  --blue-press: #0062cc;
+  --green: #34c759;
+  --orange: #ff9500;
+  --red: #ff3b30;
+  --glow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 380px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #f3f5f9 0%, #eef1f6 100%);
+  padding: 14px;
+  -webkit-font-smoothing: antialiased;
+  /* popup 窗体圆角：macOS Chrome 窗体自带 ~8px 圆角，
+     这里给 body 加更大圆角 + 裁剪，让内容边缘更圆润协调。
+     透明边角会被窗体自身背景兜住，无副作用。 */
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ---------- 顶部标题栏 ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 2px 2px 6px;
+}
+.header h1 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, #1d1d1f, #3a3a45);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 11px;
+  box-shadow: var(--glow);
+}
+
+.card h2 {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+/* 平台色标圆点（h2 前的小色块，靠 ::before，不触碰 textContent） */
+.card h2::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+/* 给四张卡片不同的主题色点 */
+.card:nth-of-type(1) h2::before { background: #30b0c7; }   /* 企业微信 */
+.card:nth-of-type(2) h2::before { background: var(--blue); }  /* GLM */
+.card:nth-of-type(3) h2::before { background: #8b5cf6; }      /* Kimi */
+.card:nth-of-type(4) h2::before { background: var(--ink-3); } /* 日志 */
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-head h2 { margin-bottom: 0; }
+
+/* ---------- 表单元素 ---------- */
+label {
+  display: block;
+  margin: 6px 0;
+  color: var(--ink);
+}
+
+input[type="text"], input[type="password"], input[type="time"] {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 4px;
+  background: #fafbfc;
+  color: var(--ink);
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+input[type="text"]:focus, input[type="password"]:focus, input[type="time"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+input[type="number"] {
+  width: 50px;
+  padding: 3px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  font-size: 12px;
+  background: #fafbfc;
+  transition: border-color .15s, box-shadow .15s;
+}
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.num { width: 46px; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  padding: 7px 16px;
+  background: linear-gradient(180deg, #2a8fff, var(--blue));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 122, 255, 0.25);
+  transition: transform .08s, box-shadow .15s, background .15s;
+}
+.btn:hover { background: linear-gradient(180deg, #3a98ff, #0a7bf0); box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3); }
+.btn:active { transform: translateY(1px); box-shadow: 0 1px 1px rgba(0, 122, 255, 0.2); }
+.btn.sm { padding: 5px 12px; font-size: 11px; border-radius: 7px; }
+
+/* ---------- 提示文字 ---------- */
+.hint { font-size: 11px; color: var(--ink-3); }
+.hint.ok { color: var(--green); font-weight: 600; }
+.hint.fail { color: var(--red); font-weight: 600; }
+
+.sub {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin: 5px 0 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  line-height: 1.9;
+}
+
+/* ---------- 套餐选择 ---------- */
+.targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 9px 0;
+}
+.targets label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: #fafbfc;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.targets label:hover { border-color: #c9c9d2; background: #f4f5f7; }
+.targets label:has(input:checked) {
+  border-color: var(--blue);
+  background: rgba(0, 122, 255, 0.07);
+  color: var(--blue);
+  font-weight: 600;
+}
+.targets input[type="checkbox"] {
+  accent-color: var(--blue);
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- 套餐状态显示 ---------- */
+.status {
+  font-size: 11px;
+  padding: 8px 10px;
+  background: #f5f6f8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 7px;
+  line-height: 1.7;
+  word-break: break-all;
+  white-space: pre-line;
+  color: var(--ink-2);
+}
+.status.bad { background: #fff2f1; border-color: #ffd9d5; color: var(--red); }
+.status.good { background: #f0fff4; border-color: #cdf5d6; color: var(--green); }
+
+/* ---------- 登录状态条 ---------- */
+.login-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.login-status.ok { background: #f0fff4; color: var(--green); }
+.login-status.ok::before { content: "●"; color: var(--green); font-size: 10px; }
+.login-status.bad { background: #fff2f1; color: var(--red); }
+.login-status.bad::before { content: "●"; color: var(--red); font-size: 10px; }
+.login-status.unknown { background: #f5f6f8; color: var(--ink-3); }
+.login-status.unknown::before { content: "○"; color: var(--ink-3); font-size: 11px; }
+
+/* ---------- 日志区 ---------- */
+.log {
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  line-height: 1.75;
+  padding: 2px 4px 2px 2px;
+  margin-top: 4px;
+}
+.log .entry {
+  padding: 2px 0;
+}
+.log .entry + .entry { border-top: 1px solid #f3f3f6; }
+.log .t {
+  color: var(--ink-3);
+  margin-right: 7px;
+  font-variant-numeric: tabular-nums;
+}
+.log .lvl-info { color: #5a5a60; }
+.log .lvl-success { color: var(--green); font-weight: 600; }
+.log .lvl-warn { color: var(--orange); font-weight: 600; }
+.log .lvl-error { color: var(--red); font-weight: 600; }
+
+/* 滚动条美化 */
+.log::-webkit-scrollbar { width: 6px; }
+.log::-webkit-scrollbar-track { background: transparent; }
+.log::-webkit-scrollbar-thumb { background: #d4d4dc; border-radius: 3px; }
+.log::-webkit-scrollbar-thumb:hover { background: #b8b8c0; }
+
+/* ---------- 开关 Switch ---------- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.switch.sm { width: 38px; height: 22px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #d8d8de;
+  border-radius: 26px;
+  transition: background .22s ease;
+}
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 20px; width: 20px;
+  left: 3px; bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform .22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.switch.sm .slider::before { height: 16px; width: 16px; left: 3px; bottom: 3px; }
+.switch input:checked + .slider { background: var(--green); }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+.switch.sm input:checked + .slider::before { transform: translateX(16px); }
+
+/* ---------- 开关关闭时的视觉降级（纯 CSS，不影响逻辑） ---------- */
+.card { transition: opacity .2s, filter .2s; }
+/* 总开关关闭：整体变淡 */
+body:has(#enabled:not(:checked)) .card:not(:first-of-type) {
+  opacity: 0.6;
+  filter: saturate(0.7);
+}
+/* GLM 开关关闭：仅 GLM 卡片变淡 */
+.card:has(#glmEnabled:not(:checked)) {
+  opacity: 0.6;
+  filter: saturate(0.7);
+}
+/* Kimi 开关关闭：仅 Kimi 卡片变淡 */
+.card:has(#kimiEnabled:not(:checked)) {
+  opacity: 0.6;
+  filter: saturate(0.7);
+}

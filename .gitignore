@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AI 工具本地目录
+.zcode/
+
+# 依赖
+node_modules/
+
+# 日志
+*.log
+
+# 构建产物
+dist/
+build/
