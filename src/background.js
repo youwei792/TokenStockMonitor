@@ -176,7 +176,15 @@ async function handlePrecheckLogin(cfg) {
 // GLM 放货窗口管理：自动开页 / 关页
 // ============================================================
 async function handleGlmWindow(cfg) {
-  if (!cfg.glm.enabled) return;
+  if (!cfg.glm.enabled) {
+    // GLM 已关闭：关闭已打开的监控页，清理状态
+    const state = await getState();
+    if (state.glmTabId) {
+      try { await chrome.tabs.remove(state.glmTabId); } catch (e) {}
+      await updateState(st => { st.glmTabId = null; return st; });
+    }
+    return;
+  }
 
   const now = new Date();
   const inBurst = isInGlmBurstWindow(cfg, now);
@@ -453,6 +461,8 @@ async function notifyKimiOpen(cfg, plan) {
 // ============================================================
 async function handleGlmStateChanged(cfg, payload) {
   const { planKey, status, buttonText, restockText, account } = payload;
+  // GLM 已关闭：忽略所有来自已打开页面的上报
+  if (!cfg.glm.enabled) return;
 
   // 账户信息上报：存到 state，不触发通知
   if (planKey === '_account' && account) {
@@ -565,6 +575,11 @@ async function handleGlmStateChanged(cfg, payload) {
 // GLM 立即检查：打开/复用 GLM 页面，触发 content script 扫描
 // ============================================================
 async function checkGlmNow(cfg, sendResponse) {
+  if (!cfg.glm.enabled) {
+    await pushLog('warn', `GLM 已关闭，立即检查已忽略`, { front: true });
+    sendResponse({ ok: false, error: 'GLM 已关闭' });
+    return;
+  }
   try {
     // 查找已打开的 GLM tab
     const tabs = await chrome.tabs.query({ url: '*://*.bigmodel.cn/glm-coding*' });
